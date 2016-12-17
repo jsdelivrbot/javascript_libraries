@@ -34,18 +34,14 @@ class Vec2 {
 	}
 
 	/**
-	 * angle of this Vec2, computed from the coordinates : <code>atan2(y, x)</code>.
+	 * angle of this Vec2, calculated from the coordinates : <code>atan2(y, x)</code>.
+	 * when used as setter, the {@link utils.geometry2d.Vec2#x|x} and {@link utils.geometry2d.Vec2#y|y} <!--
+	 * -->attributes are caluclated like this : <code>x= cos(a)\*magnitude, y= sin(a)\*magnitude</code>
 	 * @type {number}
 	 */
 	get angle() {
 		return Math.atan2(this.y, this.x);
 	}
-
-	/**
-	 * sets angle of this vector to the given one (in radians) :
-	 * <code>x= cos(a)\*magnitude, y= sin(a)\*magnitude</code>
-	 * @type {number}
-	 */
 	set angle(a) {
 		const m = this.magnitude;
 		if (m) {
@@ -55,7 +51,7 @@ class Vec2 {
 	}
 
 	/**
-	 * square magnitude of this vector, computed from the coordinates : <code><!--
+	 * square magnitude of this vector, calculated from the coordinates : <code><!--
 	 *        -->{@link utils.geometry2d.Vec2#x|x}<sup>2</sup> + {@link utils.geometry2d.Vec2#y|y}<sup>2</sup> <!--
 	 *        --></code>
 	 * @readonly
@@ -66,20 +62,17 @@ class Vec2 {
 	}
 
 	/**
-	 * magnitude of this Vec2, computed from the coordinates : <code>&radic;(<!--
+	 * magnitude of this Vec2, calculated from the coordinates : <code>&radic;(<!--
 	 *        -->{@link utils.geometry2d.Vec2#x|x}<sup>2</sup> + <!--
 	 *        -->{@link utils.geometry2d.Vec2#y|y}<sup>2</sup>)</code>.
+	 * when used as setter, the {@link utils.geometry2d.Vec2#x|x} and {@link utils.geometry2d.Vec2#y|y} <!--
+	 * -->attributes are modified to make the magnitude equal to the given one, and to keep the <!--
+	 * -->{@link utils.geometry2d.Vec2#angle|angle} value.
 	 * @type {number}
 	 */
 	get magnitude() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
-
-	/**
-	 * sets the magnitude of the vector to the given one. keeps the angle
-	 * sets x and y coordinates to make the magnitude = mag.
-	 * @type {number}
-	 */
 	set magnitude(mag) {
 		let m = this.magnitude;
 		if (m) this.mul(mag / m); else this.x = mag;
@@ -2770,17 +2763,16 @@ class Polygon extends Shape {
 	 * - get the width and height of the instance
 	 * - create 4 long enough lines, all starting from the point : one going left, one right, one up and one down
 	 * - check if all lines intersect the instance.
-	 * this method is not optimized, and work for most polygons, except too complex concave polygons <!--
-	 * -->where the "exit" is not visible from the point.
+	 * this method is not optimized, and work for most polygons, except too complex concave polygons.
 	 * @param {utils.geometry2d.Vec2} point
 	 * @returns {boolean}
 	 */
 	contains(point) {
-		let rect = this.getRect(), w = rect.width + 10, h = rect.height + 10, endPoint = point.clone(),
-			lines = [, new Line(point, endPoint.addXY(-2 * w, 0)),
-				new Line(point, endPoint.addXY(w, h)), new Line(point, endPoint.addXY(0, -2 * h))];
-		return this.intersect(new Line(point, endPoint.addXY(w, 0))) && this.intersect(lines[1])
-			&& this.intersect(lines[2]) && this.intersect(lines[3]);
+		let rect = this.getRect(), w = rect.width + 10, h = rect.height + 10, endPoint = point.clone();
+		return this.intersect(new Line(point, endPoint.addXY(w , 0 )))
+			&& this.intersect(new Line(point, endPoint.addXY(-w-w,0)))
+			&& this.intersect(new Line(point, endPoint.addXY(w , h )))
+			&& this.intersect(new Line(point, endPoint.addXY(0,-h-h)));
 	}
 
 	/**
@@ -2803,11 +2795,11 @@ class Polygon extends Shape {
 	 * @param {number} p
 	 * @returns {utils.geometry2d.Vec2}
 	 */
-	getCurvePercentPoint(p) {
+	getPercentPoint(p) {
 		let dist = this.perimeter * (p % 1), lines = this.getLines(), len = lines.length, l, i;
 		for (i = 0; i < len; i++) {
 			l = lines[i].length;
-			if (l > dist) return lines[i].getCurvePercentPoint(dist / l);
+			if (l > dist) return lines[i].getPercentPoint(dist / l);
 			else dist -= l;
 		}
 		return this.points[i].add(this.center);
@@ -3139,7 +3131,7 @@ Ray.prototype.glPointsNumber = 2;
  * @memberOf utils
  * @namespace geometry2d
  */
-window.utils['geometry2d'] = {
+window.utils.geometry2d = {
 	Vec2,
 	Rect,
 	Shape,
