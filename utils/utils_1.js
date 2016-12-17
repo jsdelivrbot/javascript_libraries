@@ -38,8 +38,8 @@ class InputManager{
 	 */
 	constructor(element) {
 		this.element = element;
-		let keyState = new Array(256);
-		for (let i = 0; i < keyState.length; i++) {
+		let keyState = new Uint8Array(256);
+		for (let i = keyState.length-1; i >= 0; i--) {
 			keyState[i] = InputManager.KeyState.UP;
 		}
 		let keyboardCallbacks = [];
@@ -313,7 +313,7 @@ class KeyMap {
 			}
 			else {
 				if(action === null || action === undefined) {
-					if(actions[keyCode] != undefined) actions[keyCode] = undefined;
+					if(actions[keyCode] !== undefined) actions[keyCode] = undefined;
 				} else actions[keyCode] = action;
 			}
 		};
@@ -444,7 +444,7 @@ let LayoutGravity = G = {
  * contains utils library : geometry and tools
  * @namespace utils
  */
-window['utils'] = {
+window.utils = {
 //######################################################################################################################
 //############################################## tools' additional methods #############################################
 //######################################################################################################################
@@ -452,7 +452,7 @@ window['utils'] = {
 	 * @memberOf utils
 	 * @namespace tools
 	 */
-	'tools': {
+	tools: {
 		InputManager,
 		KeyMap,
 		/**
@@ -498,7 +498,7 @@ window['utils'] = {
 		 * @param {{mix:function(class)}} mixins
 		 * @returns {C}
 		 */
-		'mix': (superclass, ...mixins) => {
+		mix: (superclass, ...mixins) => {
 			class C extends superclass {
 			}
 			let len = mixins.length, i = -1;
@@ -513,7 +513,7 @@ window['utils'] = {
 		 * @param {object} src
 		 * @param {boolean} [override=false]
 		 */
-		'merge': (out, src, override = false) => {
+		merge: (out, src, override = false) => {
 			for (let p in src) if (override || !out.hasOwnProperty(p)) out[p] = src[p];
 		},
 		/**
@@ -522,7 +522,7 @@ window['utils'] = {
 		 * @memberOf utils.tools
 		 * @param {object} obj
 		 */
-		'globalize': (obj) => {
+		globalize: (obj) => {
 			for (let p in obj) {
 				if (window.hasOwnProperty(p)) console.error('the property ' + p + ' already exists in global space.');
 				else window[p] = obj[p];
@@ -536,7 +536,7 @@ window['utils'] = {
 		 * @param {Array} array
 		 * @param {object} x
 		 */
-		'intersectionFilter': (array, x) => array.indexOf(x) != -1,
+		intersectionFilter: (array, x) => array.indexOf(x) != -1,
 		/**
 		 * a filter to use with Array.prototype.filter function, by binding the first argument <!--
 		 * -->to the array of element you want to exclude.
@@ -545,7 +545,7 @@ window['utils'] = {
 		 * @param {Array} array
 		 * @param {object} x
 		 */
-		'exclusionFilter': (array, x) => array.indexOf(x) == -1,
+		exclusionFilter: (array, x) => array.indexOf(x) == -1,
 		/**
 		 * a filter to use with Array.prototype.filter function, by binding the first argument <!--
 		 * -->to the class you want your objects to be instances of.
@@ -553,14 +553,14 @@ window['utils'] = {
 		 * @param {class} _class
 		 * @param {object} x
 		 */
-		'instanceFilter' : (_class, x) => x instanceof _class,
+		instanceFilter : (_class, x) => x instanceof _class,
 		/**
 		 * generates a random 24 bits color
 		 * @memberOf utils.tools
 		 * @param {number} number of bits this color will be on (32 or 24)
 		 * @returns {string}
 		 */
-		'randomColor': (bits=24) => '#'+Math.round(Math.random() * (1<<bits)).toString(16),
+		randomColor: (bits=24) => '#'+Math.round(Math.random() * (1<<bits)).toString(16),
 		/**
 		 * overrides a function of a class by the specified function, and returns the old function.
 		 * @memberOf utils.tools
@@ -569,7 +569,7 @@ window['utils'] = {
 		 * @param {function} newFunc
 		 * @returns {function}
 		 */
-		'override': (_class, funcName, newFunc) => {
+		override: (_class, funcName, newFunc) => {
 			let _super = _class.prototype[funcName];
 			_class.prototype[funcName] = newFunc;
 			return _super;
@@ -581,7 +581,7 @@ window['utils'] = {
 		 * @param {string} url
 		 * @param {function(string)} callback
 		 */
-		'getStringFromUrl': (url, callback) => {
+		getStringFromUrl: (url, callback) => {
 			let client = new XMLHttpRequest();
 			client.open('GET', url);
 			client.onreadystatechange = _ => callback(client.responseText);
@@ -595,7 +595,7 @@ window['utils'] = {
 		 * @param {number} v - integer in [0;255]
 		 * @returns {rgb}
 		 */
-		'HSVtoRGB': (h, s, v)=> {
+		HSVtoRGB: (h, s, v)=> {
 			let i = Math.floor(h * 6),
 				f = h * 6 - i,
 				p = Math.round((v * (1 - s))*255),
@@ -620,7 +620,7 @@ window['utils'] = {
 		 * @param {number} b - integer in [0;255]
 		 * @returns {hsv}
 		 */
-		'RBGtoHSV' : (r, g, b)=> {
+		RBGtoHSV : (r, g, b)=> {
 			let max = Math.max(r, g, b), min = Math.min(r, g, b),
 				d = max - min,
 				s = (max === 0 ? 0 : d / max),
@@ -642,7 +642,7 @@ window['utils'] = {
 		 * @param {number} b
 		 * @returns {string}
 		 */
-		'RGBToHex' : (r, g, b)=> (r>15?'#':'#0')+((r<<16)+(g<<8)+b).toString(16),
+		RGBToHex : (r, g, b)=> (r>15?'#':'#0')+((r<<16)+(g<<8)+b).toString(16),
 
 		LayoutGravity
 	}
@@ -657,19 +657,19 @@ utils.tools.merge(console, {
 	 * equivalent of <code>console.error(new Error(msg).stack);</code>
 	 * @param {*} msg
 	 */
-	'stack' : (msg) => console.error(new Error(msg).stack),
+	stack : (msg) => console.error(new Error(msg).stack),
 	/**
-	 * equivalent of <code>console.stack('deprecated : ' + msg
+	 * equivalent of <code>console.stack(\`deprecated : ${msg}\`)</code>
 	 * @param {*} msg
 	 */
-	'deprecated' : (msg) => console.stack('deprecated : ' + msg),
+	deprecated : (msg) => console.stack(`deprecated : ${msg}`),
 	/**
 	 * prints the 2d array in the console, where every cell in a line is separated by the separation <!--
 	 * -->character and every line is separated by line breaks
-	 * @param Array.<Array.<*>>} mat
+	 * @param {Array.<Array.<*>>} mat
 	 * @param {string} sepChar
 	 */
-	'log2dMatrix' : (mat, sepChar=',')=> {
+	log2dMatrix : (mat, sepChar=',')=> {
 		for(let i=0; i<mat.length; i++) {
 			if(mat[i].join) console.log(mat[i].join(sepChar));
 			else console.log(mat[i]);
@@ -695,7 +695,7 @@ utils.tools.merge(CanvasRenderingContext2D.prototype, {
 	 * @param {boolean} [fill=true]
 	 * @param {boolean} [stroke=!fill]
 	 */
-	'wrapText': function(text, rect, lineHeight, textGravity, fill=true, stroke=!fill) {
+	wrapText: function(text, rect, lineHeight, textGravity, fill=true, stroke=!fill) {
 		let paragraphs = text.split('\n'),
 			parLen = paragraphs.length,
 			lines = [], line,
@@ -705,7 +705,7 @@ utils.tools.merge(CanvasRenderingContext2D.prototype, {
 			metrics,
 			width = 0,
 			rectWidth = rect.width,
-			n;
+			n, y;
 		for (let i = 0; i < parLen; i++) {
 			words = paragraphs[i].split(' ');
 			len = words.length;
@@ -744,7 +744,7 @@ utils.tools.merge(CanvasRenderingContext2D.prototype, {
 			linesX.push(lineX);
 		}
 		len = lines.length;
-		var y = rect.top + lineHeight;
+		y = rect.top + lineHeight;
 		if (!(textGravity & Gravity.TOP)) {
 			if (textGravity & Gravity.BOTTOM) y = rect.bottom - lineHeight * (len - 1);
 			else if (textGravity & Gravity.CENTER) y += (rect.height - lineHeight * len) / 2;
