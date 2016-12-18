@@ -424,7 +424,7 @@ let LayoutGravity = G = {
 			(g & G.CENTER) ? G.CENTER :
 				defaultG ? defaultG : G.TOP;
 	}
-}
+};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 //######################################################################################################################
 //################################################ library concatenation ###############################################
 //######################################################################################################################
@@ -468,41 +468,31 @@ window.utils = {
 		 * 	   }
 		 * };
 		 * var B = {
-		 * 	   mix: function(_class){
-		 * 	       _class.prototype.hello = function() {
+		 *      hello: function() {
 		 * 	       		alert('Hi ' + this.x + '!');
 		 * 	       }
 		 * 	   }
 		 * };
-		 * var C = {
-		 * 	   mix: function(_class) {
-		 * 	       let hello_super = utils.tools.override(_class, 'hello', function() {
-		 * 	           hello_super.call(this);
-		 * 	           alert('how are you ?);
-		 * 	       });
-		 * 	   }
-		 * };
-		 * class D extends utils.tools.mix(A, B, C) {
+		 * class C extends utils.tools.mix(A, B) {
 		 *     constructor(x) {
 		 * 		   super(x);
 		 *	   }
 		 *	   hello() {
 		 *	       super.hello();
-		 *	       alert('It's been so long, ' + x);
+		 *	       alert('How are you ?');
 		 *	   }
 		 * }
 		 *
 		 * var d = new D('John');
-		 * d.hello(); // alert('Hi John !'); alert('how are you ?'); alert('It\'s been so long, John');
+		 * d.hello(); // alert('Hi John !'); alert('how are you ?');
 		 * @param {class} superclass
-		 * @param {{mix:function(class)}} mixins
-		 * @returns {C}
+		 * @param {Object} mixins
+		 * @returns {class}
 		 */
 		mix: (superclass, ...mixins) => {
-			class C extends superclass {
-			}
+			class C extends superclass { }
 			let len = mixins.length, i = -1;
-			while (++i < len) mixins[i].mix(C);
+			while (++i < len) utils.tools.merge(C, mixins[i], true);
 			return C;
 		},
 		/**
@@ -557,7 +547,7 @@ window.utils = {
 		/**
 		 * generates a random 24 bits color
 		 * @memberOf utils.tools
-		 * @param {number} number of bits this color will be on (32 or 24)
+		 * @param {number} bits - number of bits this color will be on (32 or 24)
 		 * @returns {string}
 		 */
 		randomColor: (bits=24) => '#'+Math.round(Math.random() * (1<<bits)).toString(16),
@@ -655,17 +645,20 @@ window.utils = {
 utils.tools.merge(console, {
 	/**
 	 * equivalent of <code>console.error(new Error(msg).stack);</code>
+	 * @memberOf console
 	 * @param {*} msg
 	 */
 	stack : (msg) => console.error(new Error(msg).stack),
 	/**
 	 * equivalent of <code>console.stack(\`deprecated : ${msg}\`)</code>
+	 * @memberOf console
 	 * @param {*} msg
 	 */
 	deprecated : (msg) => console.stack(`deprecated : ${msg}`),
 	/**
 	 * prints the 2d array in the console, where every cell in a line is separated by the separation <!--
 	 * -->character and every line is separated by line breaks
+	 * @memberOf console
 	 * @param {Array.<Array.<*>>} mat
 	 * @param {string} sepChar
 	 */
@@ -677,17 +670,37 @@ utils.tools.merge(console, {
 	}
 });
 utils.tools.merge(window,  {
-	'TYPE_UNDEFINED' : 'undefined',
-	'TYPE_OBJECT'    :  'object',
-	'TYPE_BOOLEAN'   :  'boolean',
-	'TYPE_NUMBER'    :  'number',
-	'TYPE_STRING'    :  'string',
-	'TYPE_FUNCTION'  :  'function',
+	/** result of <code> typeof x</code> when x is undefined
+	 * @type {string}
+	 */
+	'TYPE_UNDEFINED' : typeof undefined,
+	/** result of <code> typeof x</code> when x is an object
+	 * @type {string}
+	 */
+	'TYPE_OBJECT'    : typeof {},
+	/** result of <code> typeof x</code> when x is a boolean
+	 * @type {string}
+	 */
+	'TYPE_BOOLEAN'   : typeof true,
+	/** result of <code> typeof x</code> when x is a number
+	 * @type {string}
+	 */
+	'TYPE_NUMBER'    : typeof 1,
+	/** result of <code> typeof x</code> when x is a string
+	 * @type {string}
+	 */
+	'TYPE_STRING'    : typeof '',
+	/** result of <code> typeof x</code> when x is a function
+	 * @type {string}
+	 */
+	'TYPE_FUNCTION'  : typeof console.stack,
 });
 utils.tools.merge(CanvasRenderingContext2D.prototype, {
 	/**
+	 * @function
 	 * draws the text on the canvas with the specified gravity and add line breaks to make sure the text is clamped
 	 * in the specified rectangle
+	 * @name CanvasRenderingContext2D#wrapText
 	 * @param {string} text
 	 * @param {utils.geometry2d.Rect} rect
 	 * @param {number} lineHeight
