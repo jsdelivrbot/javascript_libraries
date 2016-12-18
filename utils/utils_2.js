@@ -2,7 +2,6 @@
 * Created by Loic France on 11/11/2016.
 */
 {
-	'use stricter+types';
 //######################################################################################################################
 //##################################################### geometry2d #####################################################
 //######################################################################################################################
@@ -34,14 +33,18 @@ class Vec2 {
 	}
 
 	/**
-	 * angle of this Vec2, calculated from the coordinates : <code>atan2(y, x)</code>.
-	 * when used as setter, the {@link utils.geometry2d.Vec2#x|x} and {@link utils.geometry2d.Vec2#y|y} <!--
-	 * -->attributes are caluclated like this : <code>x= cos(a)\*magnitude, y= sin(a)\*magnitude</code>
+	 * angle of this Vec2, computed from the coordinates : <code>atan2(y, x)</code>.
 	 * @type {number}
 	 */
 	get angle() {
 		return Math.atan2(this.y, this.x);
 	}
+
+	/**
+	 * sets angle of this vector to the given one (in radians) :
+	 * <code>x= cos(a)\*magnitude, y= sin(a)\*magnitude</code>
+	 * @type {number}
+	 */
 	set angle(a) {
 		const m = this.magnitude;
 		if (m) {
@@ -65,14 +68,17 @@ class Vec2 {
 	 * magnitude of this Vec2, calculated from the coordinates : <code>&radic;(<!--
 	 *        -->{@link utils.geometry2d.Vec2#x|x}<sup>2</sup> + <!--
 	 *        -->{@link utils.geometry2d.Vec2#y|y}<sup>2</sup>)</code>.
-	 * when used as setter, the {@link utils.geometry2d.Vec2#x|x} and {@link utils.geometry2d.Vec2#y|y} <!--
-	 * -->attributes are modified to make the magnitude equal to the given one, and to keep the <!--
-	 * -->{@link utils.geometry2d.Vec2#angle|angle} value.
 	 * @type {number}
 	 */
 	get magnitude() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
+
+	/**
+	 * sets the magnitude of the vector to the given one. keeps the angle
+	 * sets x and y coordinates to make the magnitude = mag.
+	 * @type {number}
+	 */
 	set magnitude(mag) {
 		let m = this.magnitude;
 		if (m) this.mul(mag / m); else this.x = mag;
@@ -2768,11 +2774,12 @@ class Polygon extends Shape {
 	 * @returns {boolean}
 	 */
 	contains(point) {
-		let rect = this.getRect(), w = rect.width + 10, h = rect.height + 10, endPoint = point.clone();
-		return this.intersect(new Line(point, endPoint.addXY(w , 0 )))
-			&& this.intersect(new Line(point, endPoint.addXY(-w-w,0)))
-			&& this.intersect(new Line(point, endPoint.addXY(w , h )))
-			&& this.intersect(new Line(point, endPoint.addXY(0,-h-h)));
+		let rect = this.getRect(), w = rect.width + 10, h = rect.height + 10, endPoint = point.clone(),
+			l = new Line(point, endPoint.addXY(-w,0));
+		return this.intersect(l)
+			&& this.intersect(l.setP1(endPoint.addXY(w+w,0)))
+			&& this.intersect(l.setP1(endPoint.addXY(-w,-h)))
+			&& this.intersect(l.setP1(endPoint.addXY(0,h+h)));
 	}
 
 	/**
@@ -3127,6 +3134,7 @@ Ray.prototype.glTrianglesNumber = 1;
  * @type {number}
  */
 Ray.prototype.glPointsNumber = 2;
+
 /**
  * @memberOf utils
  * @namespace geometry2d
@@ -3142,5 +3150,5 @@ window.utils.geometry2d = {
 	Polygon,
 	Ray
 };
-}
 
+}
